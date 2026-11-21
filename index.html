@@ -1,297 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FairShare – Project</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FairShare · Measure real contribution</title>
+  <link rel="stylesheet" href="css/app-pages.css" />
 </head>
-<body>
-  <!-- Navegación: se repite igual en las 4 páginas (cambia solo la clase "active") -->
-  <header class="site-header">
-    <a class="logo" href="index.html">FairShare</a>
-    <nav class="main-nav">
-      <a href="index.html" class="active">Project</a>
-      <a href="tasks.html">Tasks</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="report.html">Report</a>
-    </nav>
-  </header>
+<body class="fs-page">
+  <header id="fs-nav" class="fs-nav"></header>
 
-  <main class="container">
-    <section class="hero">
+  <main class="fs-main">
+    <section class="fs-hero">
       <h1>Measure real contribution, not hours.</h1>
-      <p>Create your project, agree on a team contract, and track what each member actually contributes.
-         Nothing is measured until the team gives consent.</p>
-      <div class="button-row">
-        <button type="button" id="load-demo-btn" class="btn btn-secondary">Load demo team</button>
-        <button type="button" id="reset-btn" class="btn btn-danger">Start over</button>
+      <p class="fs-sub">Create your project, agree on a team contract, and track what each member actually contributes. Nothing is measured until the team gives consent.</p>
+      <div class="fs-hero-actions">
+        <button id="load-demo" type="button" class="fs-btn fs-btn-outline">Load demo team</button>
+        <button id="start-over" type="button" class="fs-btn fs-btn-danger-outline">Start over</button>
       </div>
     </section>
 
-    <!-- Mensaje de éxito o error (oculto hasta que lo usemos) -->
-    <p id="status-message" class="message" hidden></p>
+    <div id="message"></div>
 
-    <!-- ===== Paso 1: datos del proyecto + reglas del contrato ===== -->
-    <section class="card">
+    <section class="fs-card">
       <h2>1. Project &amp; team contract</h2>
       <form id="project-form">
-        <div class="form-grid">
-          <label>Project name
-            <input type="text" id="project-name" required placeholder="e.g. Biosensor Design Report">
-          </label>
-          <label>Course
-            <input type="text" id="project-course" placeholder="e.g. Intro to Biomedical Engineering">
-          </label>
-          <label>Google Docs link
-            <input type="url" id="project-doc" placeholder="https://docs.google.com/document/d/...">
-          </label>
-          <label>Final due date
-            <input type="date" id="project-due" required>
-          </label>
+        <div class="fs-grid-2">
+          <div class="fs-field">
+            <label for="p-name">Project name</label>
+            <input id="p-name" class="fs-input" type="text" placeholder="e.g. Biosensor Design Report" required />
+          </div>
+          <div class="fs-field">
+            <label for="p-course">Course</label>
+            <input id="p-course" class="fs-input" type="text" placeholder="e.g. Intro to Biomedical Engineering" />
+          </div>
+          <div class="fs-field">
+            <label for="p-doc">Google Docs link</label>
+            <input id="p-doc" class="fs-input" type="url" placeholder="https://docs.google.com/document/d/..." />
+          </div>
+          <div class="fs-field">
+            <label for="p-due">Final due date</label>
+            <input id="p-due" class="fs-input" type="date" />
+          </div>
         </div>
 
         <h3>Team members</h3>
-        <label>One member per line: <code>Name, email</code>
-          <textarea id="project-members" required placeholder="Ana, ana@usf.edu&#10;Diego, diego@usf.edu"></textarea>
-        </label>
+        <div class="fs-field">
+          <label for="p-members">One member per line: <code>Name, email</code></label>
+          <textarea id="p-members" class="fs-input fs-area" rows="4" placeholder="Ana, ana@usf.edu&#10;Sofía, sofia@usf.edu" required></textarea>
+        </div>
 
         <h3>Team contract</h3>
-        <label>Minimum contribution score (0–100)
-          <input type="number" id="contract-min" min="0" max="100" value="60" required>
-          <span class="hint">Members below this score receive reminders.</span>
-        </label>
-        <label>Rules (one per line)
-          <textarea id="contract-rules"></textarea>
-          <span class="hint">If you change the rules or the minimum, everyone must accept again.</span>
-        </label>
+        <div class="fs-field">
+          <label for="p-min">Minimum contribution score (0–100)</label>
+          <input id="p-min" class="fs-input" type="number" min="0" max="100" value="60" />
+          <p class="fs-hint">Members below this score receive reminders.</p>
+        </div>
+        <div class="fs-field">
+          <label for="p-rules">Rules (one per line)</label>
+          <textarea id="p-rules" class="fs-input fs-area" rows="4"></textarea>
+          <p class="fs-hint">If you change the rules or the minimum, everyone must accept again.</p>
+        </div>
 
-        <button type="submit" class="btn">Save project</button>
+        <button type="submit" class="fs-btn">Save project</button>
       </form>
     </section>
 
-    <!-- ===== Paso 2: cada miembro acepta el contrato (consentimiento) ===== -->
-    <section class="card" id="contract-section" hidden>
+    <section class="fs-card">
       <h2>2. Accept the team contract</h2>
-      <p class="muted">Each member reads the rules and accepts them. Contribution tracking is only valid once everyone has accepted.</p>
-      <ol id="contract-rules-list" class="rules-list"></ol>
-      <ul id="acceptance-list" class="member-list"></ul>
-      <p id="acceptance-summary"></p>
+      <div id="contract"></div>
     </section>
   </main>
 
-  <!--
-    La lógica de esta página va aquí mismo, porque la estructura del proyecto
-    no incluye un archivo js/index.js. Es un módulo ES igual que los otros.
-  -->
-  <script type="module">
-    import { loadProject, saveProject, clearProject, createId } from "./js/storage.js";
-    import { createDemoProject } from "./js/data.js";
-
-    // Reglas sugeridas para un proyecto nuevo
-    const DEFAULT_RULES = [
-      "Each member reaches the minimum contribution score.",
-      "Internal deadline: drafts are due 3 days before the final due date.",
-      "If you can't finish a task, tell the team at least 24 hours before.",
-      "Members below the minimum receive reminders; level 4 is shown in the final report."
-    ];
-
-    // ----- Referencias a elementos del HTML -----
-    const form = document.getElementById("project-form");
-    const nameInput = document.getElementById("project-name");
-    const courseInput = document.getElementById("project-course");
-    const docInput = document.getElementById("project-doc");
-    const dueInput = document.getElementById("project-due");
-    const membersInput = document.getElementById("project-members");
-    const minInput = document.getElementById("contract-min");
-    const rulesInput = document.getElementById("contract-rules");
-    const messageEl = document.getElementById("status-message");
-    const contractSection = document.getElementById("contract-section");
-    const rulesList = document.getElementById("contract-rules-list");
-    const acceptanceList = document.getElementById("acceptance-list");
-    const acceptanceSummary = document.getElementById("acceptance-summary");
-
-    // Muestra un mensaje arriba de la página (type: "success" o "error")
-    function showMessage(text, type = "success") {
-      messageEl.textContent = text;
-      messageEl.className = `message ${type}`;
-      messageEl.hidden = false;
-    }
-
-    // Convierte el texto "Nombre, email" (una línea por miembro) en una lista.
-    // Si un miembro ya existía (mismo email o nombre), conserva su id
-    // para no perder sus tareas, ediciones y evaluaciones.
-    function parseMembers(text, existingMembers) {
-      return text
-        .split("\n")
-        .map((line) => line.trim())
-        .filter((line) => line !== "")
-        .map((line) => {
-          const [name, email = ""] = line.split(",").map((part) => part.trim());
-          const existing = existingMembers.find(
-            (m) => (email && m.email === email) || m.name === name
-          );
-          return { id: existing ? existing.id : createId("member"), name, email };
-        });
-    }
-
-    // Convierte el textarea de reglas en un arreglo de strings
-    function parseRules(text) {
-      return text.split("\n").map((r) => r.trim()).filter((r) => r !== "");
-    }
-
-    // Llena el formulario con los datos del proyecto guardado
-    function fillForm(project) {
-      nameInput.value = project.name;
-      courseInput.value = project.course;
-      docInput.value = project.docUrl;
-      dueInput.value = project.dueDate;
-      membersInput.value = project.members
-        .map((m) => (m.email ? `${m.name}, ${m.email}` : m.name))
-        .join("\n");
-      minInput.value = project.contract.minScore;
-      rulesInput.value = project.contract.rules.join("\n");
-    }
-
-    // Deja el formulario vacío (con las reglas sugeridas)
-    function resetForm() {
-      form.reset();
-      minInput.value = 60;
-      rulesInput.value = DEFAULT_RULES.join("\n");
-    }
-
-    // Dibuja la sección del contrato: reglas + botón de aceptar por miembro
-    function renderContract(project) {
-      if (!project) {
-        contractSection.hidden = true;
-        return;
-      }
-      contractSection.hidden = false;
-
-      // Reglas (usamos textContent para evitar inyectar HTML)
-      rulesList.innerHTML = "";
-      [`Minimum contribution score: ${project.contract.minScore}`, ...project.contract.rules]
-        .forEach((rule) => {
-          const li = document.createElement("li");
-          li.textContent = rule;
-          rulesList.appendChild(li);
-        });
-
-      // Un renglón por miembro
-      acceptanceList.innerHTML = "";
-      project.members.forEach((member) => {
-        const accepted = project.contract.acceptedBy.includes(member.id);
-
-        const li = document.createElement("li");
-        const label = document.createElement("span");
-        label.textContent = member.email ? `${member.name} (${member.email})` : member.name;
-
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = accepted ? "btn btn-small btn-secondary" : "btn btn-small";
-        button.textContent = accepted ? "Accepted ✓ (withdraw)" : "Accept contract";
-        button.addEventListener("click", () => toggleAcceptance(member.id));
-
-        li.append(label, button);
-        acceptanceList.appendChild(li);
-      });
-
-      // Resumen: cuántos aceptaron
-      const acceptedCount = project.contract.acceptedBy.length;
-      const total = project.members.length;
-      acceptanceSummary.textContent =
-        acceptedCount === total
-          ? `✅ All ${total} members accepted. Tracking is active.`
-          : `${acceptedCount} of ${total} members accepted. Tracking starts when everyone accepts.`;
-    }
-
-    // Aceptar o retirar la aceptación de un miembro
-    function toggleAcceptance(memberId) {
-      const project = loadProject();
-      const accepted = project.contract.acceptedBy;
-      project.contract.acceptedBy = accepted.includes(memberId)
-        ? accepted.filter((id) => id !== memberId)  // retirar
-        : [...accepted, memberId];                 // aceptar
-      saveProject(project);
-      renderContract(project);
-    }
-
-    // ----- Guardar el formulario -----
-    form.addEventListener("submit", (event) => {
-      event.preventDefault(); // evita que la página se recargue
-
-      const existing = loadProject();
-      const members = parseMembers(membersInput.value, existing ? existing.members : []);
-      if (members.length < 2) {
-        showMessage("A team needs at least 2 members.", "error");
-        return;
-      }
-
-      const minScore = Number(minInput.value);
-      const rules = parseRules(rulesInput.value);
-
-      // Si es la primera vez, creamos el proyecto con listas vacías
-      const project = existing || {
-        id: createId("project"),
-        contract: { minScore, rules, acceptedBy: [] },
-        tasks: [], edits: [], peerRatings: [], reminders: []
-      };
-
-      // Si cambió el contrato, todos deben volver a aceptarlo (consentimiento)
-      const contractChanged =
-        project.contract.minScore !== minScore ||
-        JSON.stringify(project.contract.rules) !== JSON.stringify(rules);
-
-      project.name = nameInput.value.trim();
-      project.course = courseInput.value.trim();
-      project.docUrl = docInput.value.trim();
-      project.dueDate = dueInput.value;
-      project.members = members;
-      project.contract.minScore = minScore;
-      project.contract.rules = rules;
-
-      // Solo conservamos aceptaciones de miembros que siguen en el equipo
-      const memberIds = members.map((m) => m.id);
-      project.contract.acceptedBy = contractChanged
-        ? []
-        : project.contract.acceptedBy.filter((id) => memberIds.includes(id));
-
-      saveProject(project);
-      renderContract(project);
-      showMessage(
-        contractChanged && existing
-          ? "Project saved. The contract changed, so everyone must accept it again."
-          : "Project saved. Now each member accepts the contract below."
-      );
-    });
-
-    // ----- Botón: cargar la demo -----
-    document.getElementById("load-demo-btn").addEventListener("click", () => {
-      if (loadProject() && !confirm("This will replace your current project. Continue?")) return;
-      const demo = createDemoProject();
-      saveProject(demo);
-      fillForm(demo);
-      renderContract(demo);
-      showMessage("Demo team loaded: Ana, Sofía, Diego and Matías.");
-    });
-
-    // ----- Botón: empezar de cero -----
-    document.getElementById("reset-btn").addEventListener("click", () => {
-      if (!confirm("Delete the current project and all its data?")) return;
-      clearProject();
-      resetForm();
-      renderContract(null);
-      showMessage("Project deleted. You can start a new one.");
-    });
-
-    // ----- Al abrir la página: mostrar lo que ya está guardado -----
-    const saved = loadProject();
-    if (saved) {
-      fillForm(saved);
-      renderContract(saved);
-    } else {
-      resetForm();
-    }
-  </script>
+  <script type="module" src="js/project.js"></script>
 </body>
 </html>
