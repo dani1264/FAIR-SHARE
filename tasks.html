@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tasks · FairShare</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/app-pages.css" />
+</head>
+<body class="fs-page">
+  <header id="fs-nav" class="fs-nav"></header>
+
+  <main class="fs-main" id="app">
+    <h1 class="fs-title">Tasks</h1>
+    <p class="fs-sub">Split the work, give every task an owner and a date. Completed tasks count for 30% of each member's score.</p>
+
+    <section class="fs-card">
+      <h2>Add a task</h2>
+      <form id="task-form" class="fs-form-row">
+        <div class="fs-field">
+          <label for="task-title">Task</label>
+          <input id="task-title" class="fs-input" type="text" placeholder="e.g. Write the methods section" required />
+        </div>
+        <div class="fs-field">
+          <label for="task-assignee">Assigned to</label>
+          <select id="task-assignee" class="fs-select"></select>
+        </div>
+        <div class="fs-field">
+          <label for="task-due">Due date</label>
+          <input id="task-due" class="fs-input" type="date" />
+        </div>
+        <button type="submit" class="fs-btn">Add task</button>
+      </form>
+    </section>
+
+    <section class="fs-card">
+      <div class="fs-card-head">
+        <h2>Task list</h2>
+        <span id="task-summary" class="fs-muted"></span>
+      </div>
+      <div id="task-list"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/tasks.js"></script>
+</body>
+</html>

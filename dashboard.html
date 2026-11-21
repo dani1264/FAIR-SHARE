@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · FairShare</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/app-pages.css" />
+</head>
+<body class="fs-page">
+  <header id="fs-nav" class="fs-nav"></header>
+
+  <main class="fs-main" id="app">
+    <h1 class="fs-title">Dashboard</h1>
+    <p class="fs-sub">Score = 50% document edits + 30% completed tasks + 20% peer evaluation. The black line marks the minimum from the team contract.</p>
+
+    <div id="contract-banner"></div>
+    <div id="team-stats" class="fs-stats"></div>
+    <div id="member-cards" class="fs-members"></div>
+
+    <details class="fs-card fs-import">
+      <summary><b>Import real edits from Google Docs</b> <span class="fs-muted">(optional)</span></summary>
+      <p class="fs-muted">Paste the JSON from the Apps Script log, e.g. <code>[{"email":"ana@usf.edu","count":12}]</code>. Emails are matched with team members.</p>
+      <textarea id="import-json" class="fs-textarea" placeholder='[{"email":"ana@usf.edu","count":12}]'></textarea>
+      <button id="import-btn" type="button" class="fs-btn">Import edits</button>
+    </details>
+  </main>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report · FairShare</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/app-pages.css" />
+</head>
+<body class="fs-page">
+  <header id="fs-nav" class="fs-nav"></header>
+
+  <main class="fs-main" id="app">
+    <h1 class="fs-title no-print">Report</h1>
+    <p class="fs-sub no-print">Rate your teammates, then generate the contribution report for your instructor.</p>
+
+    <section class="fs-card no-print">
+      <h2>Peer evaluation (anonymous)</h2>
+      <p class="fs-muted">Ratings are private. The report only shows each member's average.</p>
+      <div class="fs-field fs-reviewer">
+        <label for="reviewer">Who are you?</label>
+        <select id="reviewer" class="fs-select"></select>
+      </div>
+      <div id="peer-list"></div>
+      <p id="peer-progress" class="fs-muted"></p>
+    </section>
+
+    <section class="fs-card">
+      <div class="fs-card-head">
+        <h2>Contribution report</h2>
+        <button id="print-btn" type="button" class="fs-btn no-print">Print / Save PDF</button>
+      </div>
+      <div id="report"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/report.js"></script>
+</body>
+</html>
