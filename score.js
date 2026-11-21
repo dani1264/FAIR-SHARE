@@ -1,92 +1,102 @@
-// =====================================================================
-// score.js
-// Fórmula de aporte. No mide TIEMPO, mide APORTE REAL:
-//   - ediciones en el documento (50%)
-//   - tareas completadas (30%)
-//   - evaluación de los compañeros (20%)
-// =====================================================================
+// score.js — Fórmula de aporte de FairShare.
+// Funciones puras: no leen ni guardan nada, solo calculan.
 
-// Pesos de cada componente (deben sumar 1)
-export const WEIGHTS = { edits: 0.5, tasks: 0.3, peers: 0.2 };
-
-// Cuántos puntos sobre el mínimo se consideran "en riesgo"
-export const AT_RISK_MARGIN = 10;
-
-// Texto que se muestra en pantalla para cada estado
-export const STATUS_LABELS = {
-  "ok": "On track",
-  "at-risk": "At risk",
-  "below": "Below minimum"
-};
-
-// Compara el aporte de un miembro con su "parte justa" (total / N).
-// Si alguien hizo exactamente su parte justa → 100. Se limita a 100
-// para que nadie "compense" a otro haciendo el triple.
-function relativeScore(memberValue, total, memberCount) {
-  // Evitamos dividir por cero: si nadie aportó nada, vale 0 para todos
-  if (total === 0 || memberCount === 0) return 0;
-  const fairShare = total / memberCount;
-  return Math.min(100, (100 * memberValue) / fairShare);
+// Compara ids aunque uno sea número y otro texto ("1" vs 1).
+export function sameId(a, b) {
+  return String(a) === String(b);
 }
 
-// Decide el estado según el puntaje final y el mínimo del contrato.
-// Interpretación: "at-risk" = está sobre el mínimo, pero a menos de 10 puntos.
-export function getStatus(finalScore, minScore) {
-  if (finalScore < minScore) return "below";
-  if (finalScore < minScore + AT_RISK_MARGIN) return "at-risk";
+// Rellena los campos que falten para que ninguna página se rompa
+// si el proyecto viene incompleto (por ejemplo, recién creado en index.html).
+export function normalizeProject(project) {
+  if (!project) return null;
+  project.members = project.members || [];
+  project.tasks = project.tasks || [];
+  project.edits = project.edits || [];
+  project.peerRatings = project.peerRatings || [];
+  project.reminders = project.reminders || [];
+  project.contract = project.contract || {};
+  project.contract.rules = project.contract.rules || [];
+  project.contract.acceptedBy = project.contract.acceptedBy || [];
+  if (project.contract.minScore === undefined || project.contract.minScore === "") {
+    project.contract.minScore = 60;
+  }
+  project.contract.minScore = Number(project.contract.minScore);
+
+  // Cada tarea necesita un id para poder editarla o borrarla.
+  project.tasks.forEach((task, i) => {
+    if (task.id === undefined || task.id === null) task.id = "t" + (i + 1);
+  });
+  return project;
+}
+
+// "ok" | "at-risk" | "below"
+export function getStatus(score, minScore) {
+  if (score < minScore) return "below";
+  if (score < minScore + 10) return "at-risk";
   return "ok";
 }
 
-// Calcula el puntaje de TODOS los miembros del proyecto.
-// Devuelve una lista: [{ member, edits, tasksDone, editScore, taskScore,
-//                         peerScore, finalScore, status }]
-export function computeScores(project) {
-  const members = project.members;
-  const memberCount = members.length;
+export const STATUS_LABELS = {
+  ok: "On track",
+  "at-risk": "At risk",
+  below: "Below minimum",
+};
 
-  // ----- Totales del equipo -----
-  const totalEdits = project.edits.reduce((sum, e) => sum + e.count, 0);
-  const totalTasksDone = project.tasks.filter((t) => t.done).length;
+// Componente relativo al promedio del equipo, con tope de 100.
+function shareOfAverage(value, total, n) {
+  if (total <= 0 || n === 0) return 0; // evita división por cero
+  return Math.min(100, (100 * value) / (total / n));
+}
 
-  return members.map((member) => {
-    // ----- Ediciones del miembro -----
-    const editEntry = project.edits.find((e) => e.memberId === member.id);
-    const edits = editEntry ? editEntry.count : 0;
-    const editScore = relativeScore(edits, totalEdits, memberCount);
+// Devuelve una fila por miembro con sus 3 componentes, el puntaje final y el estado.
+export function calculateScores(project) {
+  const p = normalizeProject(project);
+  if (!p || p.members.length === 0) return [];
 
-    // ----- Tareas completadas del miembro -----
-    const tasksDone = project.tasks.filter(
-      (t) => t.done && t.assigneeId === member.id
-    ).length;
-    const taskScore = relativeScore(tasksDone, totalTasksDone, memberCount);
+  const n = p.members.length;
+  const minScore = p.contract.minScore;
 
-    // ----- Evaluación de pares (promedio de ratings recibidos) -----
-    const received = project.peerRatings.filter((r) => r.toId === member.id);
-    let peerScore = 0; // si nadie lo evaluó todavía, vale 0
-    if (received.length > 0) {
-      const average =
-        received.reduce((sum, r) => sum + r.rating, 0) / received.length;
-      peerScore = (average / 5) * 100;
-    }
+  const editsOf = (id) =>
+    p.edits
+      .filter((e) => sameId(e.memberId, id))
+      .reduce((sum, e) => sum + (Number(e.count) || 0), 0);
 
-    // ----- Puntaje final ponderado (redondeado) -----
-    const finalScore = Math.round(
-      WEIGHTS.edits * editScore +
-      WEIGHTS.tasks * taskScore +
-      WEIGHTS.peers * peerScore
+  const doneTasksOf = (id) =>
+    p.tasks.filter((t) => t.done && sameId(t.assigneeId, id)).length;
+
+  const totalEdits = p.members.reduce((sum, m) => sum + editsOf(m.id), 0);
+  const totalDone = p.members.reduce((sum, m) => sum + doneTasksOf(m.id), 0);
+
+  return p.members.map((m) => {
+    const edits = editsOf(m.id);
+    const tasksDone = doneTasksOf(m.id);
+    const received = p.peerRatings.filter(
+      (r) => sameId(r.toId, m.id) && !sameId(r.fromId, m.id)
     );
+    const avgRating = received.length
+      ? received.reduce((sum, r) => sum + Number(r.rating), 0) / received.length
+      : 0;
+
+    const editScore = shareOfAverage(edits, totalEdits, n);
+    const taskScore = shareOfAverage(tasksDone, totalDone, n);
+    const peerScore = (avgRating / 5) * 100;
+    const finalScore = Math.round(0.5 * editScore + 0.3 * taskScore + 0.2 * peerScore);
 
     return {
-      member,
+      memberId: m.id,
+      name: m.name,
+      email: m.email,
       edits,
       tasksDone,
-      // Redondeamos los componentes solo para mostrarlos;
-      // el finalScore se calculó con los valores exactos.
+      tasksAssigned: p.tasks.filter((t) => sameId(t.assigneeId, m.id)).length,
+      ratingsReceived: received.length,
+      avgRating,
       editScore: Math.round(editScore),
       taskScore: Math.round(taskScore),
       peerScore: Math.round(peerScore),
       finalScore,
-      status: getStatus(finalScore, project.contract.minScore)
+      status: getStatus(finalScore, minScore),
     };
   });
 }

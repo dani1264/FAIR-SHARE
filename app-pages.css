@@ -1,0 +1,186 @@
+/* app-pages.css — Estilos de Tasks, Dashboard y Report.
+   Todas las clases empiezan con "fs-" para no chocar con styles.css. */
+
+:root {
+  --fs-primary: #4f5bd5;
+  --fs-primary-dark: #3e49b8;
+  --fs-bg: #f5f6fa;
+  --fs-border: #e4e6ef;
+  --fs-text: #1f2433;
+  --fs-muted: #6b7185;
+  --fs-ok: #2f855a;
+  --fs-ok-bg: #e6f4ea;
+  --fs-risk: #b7791f;
+  --fs-risk-bg: #fdf3dc;
+  --fs-below: #c53030;
+  --fs-below-bg: #fde8e8;
+}
+
+body.fs-page {
+  margin: 0;
+  background: var(--fs-bg);
+  color: var(--fs-text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Navbar ---------- */
+.fs-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 32px; background: #fff; border-bottom: 1px solid var(--fs-border);
+  position: sticky; top: 0; z-index: 10;
+}
+.fs-brand { font-weight: 700; font-size: 1.35rem; color: var(--fs-primary); text-decoration: none; }
+.fs-nav nav { display: flex; gap: 6px; }
+.fs-nav nav a {
+  padding: 8px 14px; border-radius: 8px; color: var(--fs-muted);
+  text-decoration: none; font-weight: 500;
+}
+.fs-nav nav a:hover { color: var(--fs-text); }
+.fs-nav nav a.active { background: var(--fs-primary); color: #fff; }
+
+/* ---------- Layout ---------- */
+.fs-main { max-width: 980px; margin: 0 auto; padding: 36px 20px 72px; }
+.fs-title { font-size: 2.2rem; margin: 0 0 8px; }
+.fs-sub { color: var(--fs-muted); margin: 0 0 28px; line-height: 1.5; max-width: 720px; }
+.fs-card {
+  background: #fff; border: 1px solid var(--fs-border); border-radius: 14px;
+  padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+.fs-card h2 { margin: 0 0 16px; font-size: 1.25rem; }
+.fs-card h3 { margin: 24px 0 10px; font-size: 1.05rem; }
+.fs-card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.fs-card-head h2 { margin: 0; }
+.fs-muted { color: var(--fs-muted); }
+.fs-small { font-size: .85rem; }
+.fs-empty { text-align: center; padding: 48px 24px; }
+.fs-text-below { color: var(--fs-below); }
+
+/* ---------- Forms & buttons ---------- */
+.fs-form-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end; }
+.fs-field label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 6px; }
+.fs-input, .fs-select, .fs-textarea {
+  width: 100%; box-sizing: border-box; padding: 9px 11px;
+  border: 1px solid var(--fs-border); border-radius: 8px; font: inherit; background: #fff; color: inherit;
+}
+.fs-input:focus, .fs-select:focus, .fs-textarea:focus { outline: 2px solid #c7cdfc; border-color: var(--fs-primary); }
+.fs-textarea { min-height: 110px; font-family: ui-monospace, monospace; font-size: .9rem; margin: 8px 0 12px; }
+.fs-btn {
+  display: inline-block; padding: 10px 16px; border-radius: 8px;
+  border: 1px solid var(--fs-primary); background: var(--fs-primary); color: #fff;
+  font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
+}
+.fs-btn:hover { background: var(--fs-primary-dark); }
+.fs-btn:disabled { opacity: .55; cursor: not-allowed; }
+.fs-btn-outline { background: #fff; color: var(--fs-primary); }
+.fs-btn-outline:hover { background: #eef0fc; }
+.fs-btn-sm { padding: 6px 12px; font-size: .85rem; }
+.fs-btn-danger-text { background: none; border: none; color: var(--fs-below); cursor: pointer; font: inherit; }
+
+/* ---------- Tables ---------- */
+.fs-table-wrap { overflow-x: auto; }
+.fs-table { width: 100%; border-collapse: collapse; }
+.fs-table th, .fs-table td { padding: 10px 8px; border-bottom: 1px solid var(--fs-border); text-align: left; vertical-align: middle; }
+.fs-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--fs-muted); }
+.fs-table tr.done .task-title { text-decoration: line-through; color: var(--fs-muted); }
+.fs-table .fs-select, .fs-table .fs-input { padding: 6px 8px; }
+.fs-table tr.below-row { background: var(--fs-below-bg); }
+
+/* ---------- Badges & banners ---------- */
+.fs-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.fs-badge.ok { background: var(--fs-ok-bg); color: var(--fs-ok); }
+.fs-badge.at-risk { background: var(--fs-risk-bg); color: var(--fs-risk); }
+.fs-badge.below { background: var(--fs-below-bg); color: var(--fs-below); }
+.fs-banner { padding: 14px 18px; border-radius: 10px; margin: 0 0 20px; font-weight: 500; }
+.fs-banner.ok { background: var(--fs-ok-bg); color: var(--fs-ok); }
+.fs-banner.warn { background: var(--fs-risk-bg); color: #8a5a12; }
+.fs-banner a { color: inherit; }
+
+/* ---------- Dashboard ---------- */
+.fs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.fs-stat { background: #fff; border: 1px solid var(--fs-border); border-radius: 14px; padding: 18px 20px; }
+.fs-stat-value { font-size: 1.9rem; font-weight: 700; }
+.fs-stat-label { color: var(--fs-muted); font-size: .9rem; }
+.fs-members { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.fs-member {
+  background: #fff; border: 1px solid var(--fs-border); border-top: 5px solid var(--fs-ok);
+  border-radius: 14px; padding: 20px;
+}
+.fs-member.at-risk { border-top-color: #d69e2e; }
+.fs-member.below { border-top-color: #e53e3e; }
+.fs-member-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.fs-member-head h3 { margin: 0; font-size: 1.15rem; }
+.fs-score { font-size: 2.6rem; font-weight: 800; margin: 10px 0 8px; }
+.fs-score span { font-size: 1rem; color: var(--fs-muted); font-weight: 500; }
+.fs-meter { position: relative; height: 10px; background: #eceef5; border-radius: 999px; margin-bottom: 18px; }
+.fs-meter-fill { height: 100%; border-radius: 999px; background: #38a169; transition: width .3s; }
+.fs-meter-fill.at-risk { background: #d69e2e; }
+.fs-meter-fill.below { background: #e53e3e; }
+.fs-meter-min { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--fs-text); }
+.fs-bar { margin-bottom: 10px; }
+.fs-bar-label { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: 4px; gap: 8px; }
+.fs-bar-label span:last-child { color: var(--fs-muted); }
+.fs-bar-track { height: 6px; background: #eceef5; border-radius: 999px; }
+.fs-bar-fill { height: 100%; background: var(--fs-primary); border-radius: 999px; transition: width .3s; }
+.fs-reminders { display: flex; align-items: center; gap: 8px; font-size: .85rem; margin-top: 14px; }
+.fs-reminder-dots { display: flex; gap: 4px; }
+.fs-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--fs-border); }
+.fs-dot.on { background: var(--fs-below); }
+.fs-member-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.fs-import summary { cursor: pointer; }
+.fs-import p { margin: 12px 0 0; }
+
+/* ---------- Toast ---------- */
+#fs-toast { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; max-width: 380px; }
+.fs-toast {
+  background: var(--fs-text); color: #fff; padding: 14px 16px; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18); font-size: .92rem; line-height: 1.45;
+}
+.fs-toast a { color: #c7cdfc; }
+
+/* ---------- Report ---------- */
+.fs-reviewer { max-width: 320px; margin-bottom: 12px; }
+.fs-peer-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--fs-border); gap: 12px; }
+.fs-rating { display: flex; gap: 6px; }
+.fs-rating button {
+  width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--fs-border);
+  background: #fff; cursor: pointer; font: inherit; font-weight: 600; color: var(--fs-text);
+}
+.fs-rating button:hover { border-color: var(--fs-primary); }
+.fs-rating button.selected { background: var(--fs-primary); color: #fff; border-color: var(--fs-primary); }
+.fs-report-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 24px; margin-bottom: 8px; }
+.fs-rules { padding-left: 20px; line-height: 1.6; margin: 0 0 8px; }
+.fs-notes { line-height: 1.6; color: var(--fs-below); padding-left: 20px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .fs-form-row, .fs-stats, .fs-report-meta { grid-template-columns: 1fr; }
+  .fs-nav { flex-direction: column; gap: 10px; padding: 12px 16px; }
+  .fs-title { font-size: 1.8rem; }
+}
+
+/* ---------- Print (Report → PDF) ---------- */
+@media print {
+  .fs-nav, .no-print, #fs-toast { display: none !important; }
+  body.fs-page { background: #fff; }
+  .fs-main { padding: 0; max-width: none; }
+  .fs-card { border: none; box-shadow: none; padding: 0; }
+  .fs-table tr.below-row, .fs-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ---------- Project page (index.html) ---------- */
+.fs-hero h1 { font-size: 2.6rem; margin: 0 0 12px; line-height: 1.15; }
+.fs-hero .fs-sub { font-size: 1.1rem; }
+.fs-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.fs-btn-danger-outline { background: #fff; color: var(--fs-below); border-color: var(--fs-below); }
+.fs-btn-danger-outline:hover { background: var(--fs-below-bg); }
+.fs-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.fs-field { margin-bottom: 16px; }
+.fs-area { resize: vertical; line-height: 1.5; }
+.fs-hint { color: var(--fs-muted); font-size: .88rem; margin: 6px 0 0; }
+.fs-accept-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--fs-border); }
+.fs-contract-status { margin: 16px 0 0; }
+.fs-contract-status a { color: var(--fs-primary); font-weight: 600; }
+@media (max-width: 760px) { .fs-grid-2 { grid-template-columns: 1fr; } .fs-hero h1 { font-size: 2rem; } }

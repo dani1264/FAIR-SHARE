@@ -1,4 +1,5 @@
 // ui.js — Ayudas visuales compartidas por Tasks, Dashboard y Report.
+import { resetDemo } from "./storage.js";
 
 // Evita que un nombre con "<" o comillas rompa el HTML.
 export function esc(value) {
@@ -56,13 +57,19 @@ export function toast(html, ms = 5000) {
 }
 
 // Mensaje cuando todavía no hay proyecto guardado.
+// Incluye un botón para cargar la demo directamente desde esta página.
 export function noProjectMessage(container) {
   container.innerHTML = `
     <div class="fs-card fs-empty">
       <h2>No project yet</h2>
-      <p class="fs-muted">Create a project or load the demo team on the Project page first.</p>
-      <a class="fs-btn" href="index.html">Go to Project</a>
+      <p class="fs-muted">Create a project on the Project page, or load the demo team right here.</p>
+      <button type="button" class="fs-btn" id="fs-load-demo">Load demo team</button>
+      <a class="fs-btn fs-btn-outline" href="index.html">Go to Project</a>
     </div>`;
+  document.getElementById("fs-load-demo").addEventListener("click", () => {
+    resetDemo();
+    location.reload();
+  });
 }
 
 export function newId(prefix) {
